@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.response import Response
+from rest_framework import status
 from .models import Reservation
 from users.models import CustomUser
 from rest_framework.decorators import api_view, permission_classes
@@ -23,9 +24,11 @@ def patient_profile(request):
 def patient_reservations(request):
     patient_id = request.query_params['patient_id']
     patient = CustomUser.objects.get(pk=patient_id)
-    reservations = Reservation.objects.get(patient=patient)
-    reservations_serializer = patient_reservation_serializer(reservations)
-    return Response(reservations_serializer.data)
+    reservations = Reservation.objects.filter(patient=patient)
+    if reservations:
+        reservations_serializer = patient_reservation_serializer(reservations, many=True)
+        return Response(reservations_serializer.data)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET', ])
@@ -42,9 +45,12 @@ def doctor_profile(request):
 def doctor_reservations(request):
     doctor_id = request.query_params['doctor_id']
     doctor = CustomUser.objects.get(pk=doctor_id)
-    reservations = Reservation.objects.get(doctor=doctor)
-    reservations_serializer = doctor_reservation_serializer(reservations)
-    return Response(reservations_serializer.data)
+    reservations = Reservation.objects.filter(doctor=doctor)
+    if reservations:
+        reservations_serializer = doctor_reservation_serializer(reservations)
+        return Response(reservations_serializer.data)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET', ])
@@ -53,3 +59,20 @@ def doctors(request):
     all_doctors = CustomUser.objects.filter(is_doctor=True)
     serializer = UserSerializer(all_doctors, many=True)
     return Response(serializer.data)
+
+
+@api_view(['POST', ])
+@permission_classes([IsAuthenticated, ])
+def delete_reservation(request):
+    reservation = Reservation.objects.get(pk=request.data['reservation_id'])
+    reservation.delete()
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST', ])
+@permission_classes([IsAuthenticated, ])
+def delete_patient_reservation(request):
+    reservation = Reservation.objects.get(pk=request.data['reservation_id'])
+    reservation.patient = None
+    reservation.save()
+    return Response(status=status.HTTP_200_OK)

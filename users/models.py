@@ -3,7 +3,8 @@ from django.db import models
 
 
 class CustomUser(AbstractUser):
-    name = models.CharField(blank=True, max_length=255)
+    field = models.CharField(blank=True, max_length=20, default="پزشک عمومی")
+    phone_number = models.CharField(blank= True, max_length=10)
 
     def __str__(self):
-        return self.email
+        return self.username

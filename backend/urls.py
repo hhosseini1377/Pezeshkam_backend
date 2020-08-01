@@ -15,10 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from djoser.urls.base import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('doctor/', include('doctor.urls')),
     path('api/', include('api.urls')),
+    path('reservation/', include('reservation.urls'))
 ]

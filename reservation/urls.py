@@ -1,0 +1,8 @@
+from django.urls import include, path
+
+from . import views
+
+urlpatterns = [
+    path('patient_profile/', views.patient_profile),
+    path('patient_reservations/', views.patient_reservations),
+]

@@ -16,19 +16,9 @@ def patient_profile(request):
     patient_id = request.query_params['patient_id']
     patient = CustomUser.objects.get(pk=patient_id)
     patient_serializer = patient_profile_serializer(patient)
-    return Response(patient_serializer.data)
-
-
-@api_view(['GET', ])
-@permission_classes([IsAuthenticated, ])
-def patient_reservations(request):
-    patient_id = request.query_params['patient_id']
-    patient = CustomUser.objects.get(pk=patient_id)
     reservations = Reservation.objects.filter(patient=patient)
-    if reservations:
-        reservations_serializer = patient_reservation_serializer(reservations, many=True)
-        return Response(reservations_serializer.data)
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    reservations_serializer = patient_reservation_serializer(reservations, many=True)
+    return Response([patient_serializer.data, reservations_serializer.data])
 
 
 @api_view(['GET', ])
@@ -37,20 +27,9 @@ def doctor_profile(request):
     doctor_id = request.query_params['doctor_id']
     doctor = CustomUser.objects.get(pk=doctor_id)
     doctor_serializer = doctor_profile_serializer(doctor)
-    return Response(doctor_serializer.data)
-
-
-@api_view(['GET', ])
-@permission_classes([IsAuthenticated, ])
-def doctor_reservations(request):
-    doctor_id = request.query_params['doctor_id']
-    doctor = CustomUser.objects.get(pk=doctor_id)
     reservations = Reservation.objects.filter(doctor=doctor)
-    if reservations:
-        reservations_serializer = doctor_reservation_serializer(reservations)
-        return Response(reservations_serializer.data)
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    reservations_serializer = doctor_reservation_serializer(reservations)
+    return Response([doctor_serializer.data, reservations_serializer])
 
 
 @api_view(['GET', ])
@@ -103,3 +82,12 @@ def edit_profile(request):
 @permission_classes([IsAuthenticated, ])
 def get_user_id(request):
     return Response(request.user.pk)
+
+
+@api_view(['GET', ])
+@permission_classes([IsAuthenticated, ])
+def search_doctor(request):
+    search_text = request.query_params['search']
+    searched_doctors = (CustomUser.objects.filter(is_doctor=True, username__contains=search_text) | CustomUser.objects.filter(is_doctor=True, field__contains=search_text)).distinct()
+    search_serializer = doctor_profile_serializer(searched_doctors, many=True)
+    return Response(search_serializer.data)

@@ -76,3 +76,24 @@ def delete_patient_reservation(request):
     reservation.patient = None
     reservation.save()
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST', ])
+@permission_classes([IsAuthenticated, ])
+def set_profile(request):
+    username = request.data['username']
+    user = CustomUser.objects.get(username=username)
+    user.phone_number = request.data['phone_number']
+    user.is_doctor = request.data['is_doctor']
+    user.save()
+    return Response(user.pk)
+
+
+@api_view(['POST', ])
+@permission_classes([IsAuthenticated, ])
+def edit_profile(request):
+    user = CustomUser.objects.get(pk=request.data['user_id'])
+    serializer = UserSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)

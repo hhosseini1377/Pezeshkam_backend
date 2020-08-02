@@ -9,5 +9,7 @@ urlpatterns = [
     path('doctor_reservations/', views.doctor_reservations),
     path('all_doctors/', views.doctors),
     path('delete_reservation/', views.delete_reservation),
-    path('delete_patient_reservation/', views.delete_patient_reservation)
+    path('delete_patient_reservation/', views.delete_patient_reservation),
+    path('set_profile/', views.set_profile),
+    path('edit_profile/', views.edit_profile)
 ]

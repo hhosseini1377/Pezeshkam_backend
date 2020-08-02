@@ -97,3 +97,9 @@ def edit_profile(request):
     if serializer.is_valid():
         serializer.save()
     return Response(serializer.data)
+
+
+@api_view(['GET', ])
+@permission_classes([IsAuthenticated, ])
+def get_user_id(request):
+    return Response(request.user.pk)

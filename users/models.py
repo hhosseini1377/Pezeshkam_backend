@@ -7,6 +7,7 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(blank=True, max_length=10)
     is_doctor = models.BooleanField(default=True)
     avatar = models.ImageField(default='default_avatar.png')
+    name = models.CharField(max_length=20, default="ناشناس")
 
     def __str__(self):
         return self.username

@@ -12,24 +12,19 @@ from .serializers import patient_profile_serializer, patient_reservation_seriali
 
 @api_view(['GET', ])
 @permission_classes([IsAuthenticated, ])
-def patient_profile(request):
-    patient_id = request.query_params['patient_id']
-    patient = CustomUser.objects.get(pk=patient_id)
-    patient_serializer = patient_profile_serializer(patient)
-    reservations = Reservation.objects.filter(patient=patient)
-    reservations_serializer = patient_reservation_serializer(reservations, many=True)
-    return Response([patient_serializer.data, reservations_serializer.data])
-
-
-@api_view(['GET', ])
-@permission_classes([IsAuthenticated, ])
-def doctor_profile(request):
-    doctor_id = request.query_params['doctor_id']
-    doctor = CustomUser.objects.get(pk=doctor_id)
-    doctor_serializer = doctor_profile_serializer(doctor)
-    reservations = Reservation.objects.filter(doctor=doctor)
-    reservations_serializer = doctor_reservation_serializer(reservations, many=True)
-    return Response([doctor_serializer.data, reservations_serializer.data])
+def user_profile(request):
+    user_id = request.query_params['user_id']
+    user = CustomUser.objects.get(pk=user_id)
+    if not user.is_doctor:
+        patient_serializer = patient_profile_serializer(user)
+        reservations = Reservation.objects.filter(patient=user)
+        reservations_serializer = patient_reservation_serializer(reservations, many=True)
+        return Response([patient_serializer.data, reservations_serializer.data])
+    else:
+        doctor_serializer = doctor_profile_serializer(user)
+        reservations = Reservation.objects.filter(doctor=user)
+        reservations_serializer = doctor_reservation_serializer(reservations, many=True)
+        return Response([doctor_serializer.data, reservations_serializer.data])
 
 
 @api_view(['GET', ])

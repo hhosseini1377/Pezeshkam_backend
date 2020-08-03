@@ -65,6 +65,8 @@ def set_profile(request):
     serializer = UserSerializer(user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
+    else:
+        print('mamad')
     return Response(status=status.HTTP_200_OK)
 
 

@@ -29,7 +29,8 @@ class doctor_reservation_serializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+
 class get_user_serializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('pk')
+        fields = ['pk']

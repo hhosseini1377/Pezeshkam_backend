@@ -28,8 +28,8 @@ def doctor_profile(request):
     doctor = CustomUser.objects.get(pk=doctor_id)
     doctor_serializer = doctor_profile_serializer(doctor)
     reservations = Reservation.objects.filter(doctor=doctor)
-    reservations_serializer = doctor_reservation_serializer(reservations)
-    return Response([doctor_serializer.data, reservations_serializer])
+    reservations_serializer = doctor_reservation_serializer(reservations, many=True)
+    return Response([doctor_serializer.data, reservations_serializer.data])
 
 
 @api_view(['GET', ])
@@ -62,10 +62,10 @@ def delete_patient_reservation(request):
 def set_profile(request):
     username = request.data['username']
     user = CustomUser.objects.get(username=username)
-    user.phone_number = request.data['phone_number']
-    user.is_doctor = request.data['is_doctor']
-    user.save()
-    return Response(user.pk)
+    serializer = UserSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['POST', ])

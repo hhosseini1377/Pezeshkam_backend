@@ -6,7 +6,7 @@ from users.models import CustomUser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from users.serializers import UserSerializer
-from .serializers import patient_profile_serializer, patient_reservation_serializer, doctor_profile_serializer, doctor_reservation_serializer
+from .serializers import patient_profile_serializer, patient_reservation_serializer, doctor_profile_serializer, doctor_reservation_serializer, get_user_serializer
 # Create your views here.
 
 
@@ -83,7 +83,9 @@ def edit_profile(request):
 @api_view(['GET', ])
 @permission_classes([IsAuthenticated, ])
 def get_user_id(request):
-    return Response(request.user.pk)
+    user = request.user
+    serializer = get_user_serializer(user)
+    return Response(serializer.data)
 
 
 @api_view(['GET', ])

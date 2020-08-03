@@ -28,3 +28,8 @@ class doctor_reservation_serializer(serializers.ModelSerializer):
         model = Reservation
         fields = '__all__'
         depth = 1
+
+class get_user_serializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('pk')

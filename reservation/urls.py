@@ -11,5 +11,5 @@ urlpatterns = [
     path('edit_profile/', views.edit_profile),
     path('get_id/', views.get_user_id),
     path('search_doctor/', views.search_doctor),
-
+    path('reserve/', views.reserve)
 ]

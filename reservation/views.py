@@ -90,3 +90,15 @@ def search_doctor(request):
     searched_doctors = (CustomUser.objects.filter(is_doctor=True, username__contains=search_text) | CustomUser.objects.filter(is_doctor=True, field__contains=search_text)).distinct()
     search_serializer = doctor_profile_serializer(searched_doctors, many=True)
     return Response(search_serializer.data)
+
+
+@api_view(['POST', ])
+@permission_classes([IsAuthenticated, ])
+def reserve(request):
+    patient_id = request.data['patient_id']
+    reservation_id = request.data['reservation_id']
+    patient = CustomUser.objects.get(pk=patient_id)
+    reservation = Reservation.objects.get(pk=reservation_id)
+    reservation.patient = patient
+    reservation.save()
+    return Response(status=status.HTTP_200_OK)

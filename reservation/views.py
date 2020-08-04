@@ -6,7 +6,10 @@ from users.models import CustomUser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from users.serializers import UserSerializer
-from .serializers import patient_profile_serializer, patient_reservation_serializer, doctor_profile_serializer, doctor_reservation_serializer, get_user_serializer
+from .serializers import patient_profile_serializer, patient_reservation_serializer, doctor_profile_serializer, \
+    doctor_reservation_serializer, get_user_serializer
+
+
 # Create your views here.
 
 
@@ -87,7 +90,9 @@ def get_user_id(request):
 @permission_classes([IsAuthenticated, ])
 def search_doctor(request):
     search_text = request.query_params['search']
-    searched_doctors = (CustomUser.objects.filter(is_doctor=True, username__contains=search_text) | CustomUser.objects.filter(is_doctor=True, field__contains=search_text)).distinct()
+    searched_doctors = (
+                CustomUser.objects.filter(is_doctor=True, username__contains=search_text) | CustomUser.objects.filter(
+            is_doctor=True, field__contains=search_text)).distinct()
     search_serializer = doctor_profile_serializer(searched_doctors, many=True)
     return Response(search_serializer.data)
 
@@ -102,3 +107,60 @@ def reserve(request):
     reservation.patient = patient
     reservation.save()
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST', ])
+@permission_classes([IsAuthenticated, ])
+def create_reservation(request):
+    doctor_id = request.data['doctor_id']
+    doctor = CustomUser.objects.get(pk=doctor_id)
+    day = int(request.data['day'])
+    month = int(request.data['month'])
+    year = int(request.data['year'])
+    start_hour = int(request.data['start_hour'])
+    end_hour = int(request.data['end_hour'])
+    start_minute = int(request.data['start_minute'])
+    end_minute = int(request.data['end_minute'])
+    period = int(request.data['period'])
+    is_valid = True
+    if day > 31 or day < 1:
+        is_valid = False
+    elif month < 1 or month > 12:
+        is_valid = False
+    elif year < 1399:
+        is_valid = False
+    reservations = list(Reservation.objects.filter(doctor=doctor, day=day, month=month, year=year))
+    start_time = 60 * start_hour + start_minute
+    end_time = 60 * end_hour + end_minute
+    for reservation in reservations:
+        reservation_start_time = 60 * int(reservation.start_hour) + int(reservation.start_minute)
+        reservation_end_time = 60 * int(reservation.end_hour) + int(reservation.end_minute)
+        if start_time < reservation_start_time < end_time:
+            is_valid = False
+        elif start_time < reservation_end_time < end_time:
+            is_valid = False
+    if start_hour > 24 or end_hour > 24:
+        is_valid = False
+    if start_minute > 60 or end_minute > 60:
+        is_valid = False
+    if end_time < start_time:
+        is_valid = False
+    if (end_time - start_time) % period != 0:
+        is_valid = False
+    if not is_valid:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    times_num = int((end_time - start_time) / period)
+    end_time = start_time
+    end_time += period  
+    for _ in (0, times_num):
+        start_hour = int(start_time / 60)
+        start_minute = start_time % 60
+        end_hour = int(end_time / 60)
+        end_minute = end_time % 60
+        Reservation.objects.create(doctor=doctor, start_hour=str(start_hour), end_hour=str(end_hour), start_minute=str(start_minute),
+                                   end_minute=str(end_minute), year=str(year), month=str(month), day=str(day))
+        start_time += period
+        end_time += period
+    return Response(status=status.HTTP_200_OK)
+
+

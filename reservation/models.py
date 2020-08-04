@@ -11,5 +11,5 @@ class Reservation(models.Model):
     start_minute = models.CharField(max_length=2)
     end_hour = models.CharField(max_length=2)
     end_minute = models.CharField(max_length=2)
-    patient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='patient', null=True)
+    patient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='patient', null=True, blank=True)
     doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='doctor')

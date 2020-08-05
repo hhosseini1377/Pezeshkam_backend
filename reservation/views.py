@@ -110,7 +110,7 @@ def reserve(request):
 
 
 @api_view(['POST', ])
-@permission_classes([IsAuthenticated, ])
+# @permission_classes([IsAuthenticated, ])
 def create_reservation(request):
     doctor_id = request.data['doctor_id']
     doctor = CustomUser.objects.get(pk=doctor_id)
@@ -151,7 +151,7 @@ def create_reservation(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     times_num = int((end_time - start_time) / period)
     end_time = start_time
-    end_time += period  
+    end_time += period
     for _ in (0, times_num):
         start_hour = int(start_time / 60)
         start_minute = start_time % 60

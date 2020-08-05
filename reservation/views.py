@@ -67,8 +67,11 @@ def set_profile(request):
     serializer = UserSerializer(user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
+    if request.data['is_doctor']:
+        user.avatar = 'default_doctor.jpg'
     else:
-        print('mamad')
+        user.avatar = 'default_patient.jpg'
+    user.save()
     return Response(status=status.HTTP_200_OK)
 
 

@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from users.serializers import UserSerializer
 from .serializers import patient_profile_serializer, patient_reservation_serializer, doctor_profile_serializer, \
-    doctor_reservation_serializer, get_user_serializer
+    doctor_reservation_serializer, get_user_serializer, user_avatar_serializer
 
 
 # Create your views here.
@@ -37,7 +37,9 @@ def user_profile(request):
 def doctors(request):
     all_doctors = CustomUser.objects.filter(is_doctor=True)
     serializer = UserSerializer(all_doctors, many=True)
-    return Response(serializer.data)
+    user = request.user
+    avatar_serializer = user_avatar_serializer(user)
+    return Response([serializer.data, avatar_serializer.data])
 
 
 @api_view(['POST', ])

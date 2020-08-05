@@ -34,3 +34,9 @@ class get_user_serializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['pk']
+
+
+class user_avatar_serializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['avatar']

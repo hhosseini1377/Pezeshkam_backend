@@ -1,3 +1,5 @@
+from json import loads
+
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
@@ -168,7 +170,7 @@ def create_reservation(request):
     times_num = int((end_time - start_time) / period)
     end_time = start_time
     end_time += period
-    for _ in (0, times_num):
+    for i in range(0, times_num):
         start_hour = int(start_time / 60)
         start_minute = start_time % 60
         end_hour = int(end_time / 60)
@@ -178,6 +180,6 @@ def create_reservation(request):
         start_time += period
         end_time += period
     res = {'message': 'زمان‌های رزرو با موفقیت اضافه شدند.'}
-    return Response(res, status=status.HTTP_200_OK)
+    return Response((json.dumps(res)), status=status.HTTP_200_OK)
 
 

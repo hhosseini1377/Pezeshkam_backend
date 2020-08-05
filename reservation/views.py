@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.utils import json
+
 from .models import Reservation
 from users.models import CustomUser
 from rest_framework.decorators import api_view, permission_classes
@@ -148,7 +150,8 @@ def create_reservation(request):
     if (end_time - start_time) % period != 0:
         is_valid = False
     if not is_valid:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        res = {"code": 400, "message": "Bad Requset"}
+        return Response(res, status=status.HTTP_200_OK)
     times_num = int((end_time - start_time) / period)
     end_time = start_time
     end_time += period

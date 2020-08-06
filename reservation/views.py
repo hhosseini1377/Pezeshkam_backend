@@ -139,9 +139,6 @@ def create_reservation(request):
         is_valid = False
     elif year < 1399:
         is_valid = False
-    if not is_valid:
-        res = {'message': 'تاریخ وارد شده معتبر نمی‌باشد.'}
-        return Response(res, status=status.HTTP_200_OK)
     reservations = list(Reservation.objects.filter(doctor=doctor, day=day, month=month, year=year))
     start_time = 60 * start_hour + start_minute
     end_time = 60 * end_hour + end_minute
@@ -152,9 +149,6 @@ def create_reservation(request):
             is_valid = False
         elif start_time < reservation_end_time < end_time:
             is_valid = False
-    if not is_valid:
-        res = {'message': 'تداخل زمانی میان زمان‌‌های رزرو این روز و زمان‌های وارد شده توسط شما وجود دارد.'}
-        return Response(res, status=status.HTTP_200_OK)
     if start_hour > 24 or end_hour > 24:
         is_valid = False
     if start_minute > 60 or end_minute > 60:
@@ -162,11 +156,9 @@ def create_reservation(request):
     if end_time < start_time:
         is_valid = False
     if (end_time - start_time) % period != 0:
-        res = {'message': 'زمان‌های وارد شده با بازه زمانی مطابقت ندارد.'}
-        return Response(res, status=status.HTTP_200_OK)
+        is_valid = False
     if not is_valid:
-        res = {'message': 'زمان‌های وارد شده معتبر نمی‌باشند.'}
-        return Response(res, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     times_num = int((end_time - start_time) / period)
     end_time = start_time
@@ -180,7 +172,6 @@ def create_reservation(request):
                                    end_minute=str(end_minute), year=str(year), month=str(month), day=str(day))
         start_time += period
         end_time += period
-    res = {'message': 'زمان‌های رزرو با موفقیت اضافه شدند.'}
-    return Response((json.dumps(res)), status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_200_OK)
 
 

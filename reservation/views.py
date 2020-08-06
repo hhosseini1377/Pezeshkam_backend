@@ -123,6 +123,7 @@ def reserve(request):
 def create_reservation(request):
     doctor_id = request.data['doctor_id']
     doctor = CustomUser.objects.get(pk=doctor_id)
+    print(doctor_id)
     day = int(request.data['day'])
     month = int(request.data['month'])
     year = int(request.data['year'])
